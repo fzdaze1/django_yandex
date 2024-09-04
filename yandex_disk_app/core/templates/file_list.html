@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список файлов</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <form method="get">
+        <label for="file_type">Фильтр по типу:</label>
+        <select name="file_type" id="file_type">
+            <option value="">Все</option>
+            <option value="document">Документы</option>
+            <option value="image">Изображения</option>
+        </select>
+        <button type="submit">Применить</button>
+    </form>
+    <h1>Файлы и папки</h1>
+    
+    {% if items %}
+        <form id="multi-download-form">
+            <ul>
+                {% for item in items %}
+                    {% if item.type == 'file' %}
+                        <li>
+                            <label>
+                                <input type="checkbox" name="file_urls" value="{{ item.file|default:item.public_key }}" data-file-name="{{ item.name }}">
+                                {{ item.name }}
+                            </label>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <button type="button" onclick="downloadSelectedFiles()">Скачать выбранные</button>
+        </form>
+    {% else %}
+        <p>Нет доступных файлов.</p>
+    {% endif %}
+    
+    <a href="{% url 'home' %}">Ввести другую ссылку</a>
+
+    <script>
+        function downloadSelectedFiles() {
+            var form = document.getElementById('multi-download-form');
+            var checkboxes = form.querySelectorAll('input[type="checkbox"]:checked');
+
+            checkboxes.forEach(function(checkbox) {
+                var fileUrl = checkbox.value;
+                var fileName = checkbox.getAttribute('data-file-name');
+
+                // Создание скрытой ссылки для скачивания файла
+                var link = document.createElement('a');
+                link.href = "{% url 'download_file' %}";
+                link.setAttribute('download', fileName);
+
+                // Добавление скрытых input элементов для передачи данных через GET-параметры
+                var urlParams = new URLSearchParams();
+                urlParams.append('file_url', fileUrl);
+                urlParams.append('file_name', fileName);
+
+                // Установка параметров ссылки
+                link.href += "?" + urlParams.toString();
+
+                // Программный клик на ссылке для скачивания файла
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }
+    </script>
+</body>
+</html>

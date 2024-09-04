@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Яндекс.Диск Viewer</title>
+    <!-- Подключение файла стилей -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <h1>Ввод публичной ссылки на Яндекс.Диск</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Просмотреть файлы</button>
+    </form>
+</body>
+</html>
